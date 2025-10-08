@@ -15,20 +15,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             MCompanySeeder::class,
-            BSystemSeeder::class,
             BAccountingsubgroupSeeder::class,
             UserSeeder::class,
             BRoleSeeder::class,
-            BApitypeSeeder::class,
-            BMenuSeeder::class,
             BInvoicetypeSeeder::class,
             BProvinceSeeder::class,
             BCitySeeder::class,
             SMenucolumnSeeder::class,
-            BApiSeeder::class,
-            RMenusapiSeeder::class,
-            RMenusroleSeeder::class,
-            RUsersroleSeeder::class,
         ]);
     }
 }

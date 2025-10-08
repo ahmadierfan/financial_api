@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Http\Controllers\Relation\RUsersroleController;
 use App\Http\Controllers\Sub\SUserloginController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
 
