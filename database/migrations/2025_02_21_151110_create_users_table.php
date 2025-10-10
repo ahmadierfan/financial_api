@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('fk_company')->nullable()->constrained('m_companies', 'pk_company');
             $table->foreignId('fk_agency')->nullable()->constrained('m_agencies', 'pk_agency');
-            $table->foreignId('fk_registrar')->nullable()->constrained('users', );
+            $table->foreignId('fk_registrar')->nullable()->constrained('users',);
             $table->foreignId('fk_accountingsub')->nullable();
             $table->foreignId('fk_useraddress')->nullable()->constrained('s_useraddresses', 'pk_useraddress');
             $table->bigInteger('subscriptionid')->nullable()->unique();
@@ -45,12 +45,45 @@ class CreateUsersTable extends Migration
 
             $table->index(['fk_agency', 'fk_company', 'fk_registrar', 'fk_useraddress']);
         });
-
-
     }
 
     public function down()
     {
+        if (Schema::hasTable('b_banks')) {
+            Schema::table('b_banks', function (Blueprint $table) {
+                if (Schema::hasColumn('b_banks', 'fk_registrar')) {
+                    $table->dropForeign(['fk_registrar']);
+                }
+            });
+        }
+        if (Schema::hasTable('m_agencies')) {
+            Schema::table('m_agencies', function (Blueprint $table) {
+                if (Schema::hasColumn('m_agencies', 'fk_registrar')) {
+                    $table->dropForeign(['fk_registrar']);
+                }
+            });
+        }
+        if (Schema::hasTable('m_companies')) {
+            Schema::table('m_companies', function (Blueprint $table) {
+                if (Schema::hasColumn('m_companies', 'fk_regsitrar')) {
+                    $table->dropForeign(['fk_regsitrar']);
+                }
+            });
+        }
+        if (Schema::hasTable('s_accountingsubs')) {
+            Schema::table('s_accountingsubs', function (Blueprint $table) {
+                if (Schema::hasColumn('s_accountingsubs', 'fk_registrar')) {
+                    $table->dropForeign(['fk_registrar']);
+                }
+            });
+        }
+        if (Schema::hasTable('b_units')) {
+            Schema::table('b_units', function (Blueprint $table) {
+                if (Schema::hasColumn('b_units', 'fk_registrar')) {
+                    $table->dropForeign(['fk_registrar']);
+                }
+            });
+        }
         Schema::dropIfExists('users');
     }
 }

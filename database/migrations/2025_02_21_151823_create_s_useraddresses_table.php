@@ -41,12 +41,17 @@ class CreateSUseraddressesTable extends Migration
             $table->tinyInteger('isenable')->default(1);
             $table->timestamps(0);
         });
-
-
     }
 
     public function down()
     {
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (Schema::hasColumn('users', 'fk_useraddress')) {
+                    $table->dropForeign(['fk_useraddress']);
+                }
+            });
+        }
         Schema::dropIfExists('s_useraddresses');
     }
 }

@@ -26,6 +26,34 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('for_unit');
+        if (Schema::hasTable('m_products')) {
+            Schema::table('m_products', function (Blueprint $table) {
+                if (Schema::hasColumn('m_products', 'fk_secunit')) {
+                    $table->dropForeign(['fk_secunit']);
+                }
+            });
+        }
+        if (Schema::hasTable('m_products')) {
+            Schema::table('m_products', function (Blueprint $table) {
+                if (Schema::hasColumn('m_products', 'fk_unit')) {
+                    $table->dropForeign(['fk_unit']);
+                }
+            });
+        }
+        if (Schema::hasTable('s_invoicedetails')) {
+            Schema::table('s_invoicedetails', function (Blueprint $table) {
+                if (Schema::hasColumn('s_invoicedetails', 'fk_unit')) {
+                    $table->dropForeign(['fk_unit']);
+                }
+            });
+        }
+        if (Schema::hasTable('s_warehousedocdetails')) {
+            Schema::table('s_warehousedocdetails', function (Blueprint $table) {
+                if (Schema::hasColumn('s_warehousedocdetails', 'fk_unit')) {
+                    $table->dropForeign(['fk_unit']);
+                }
+            });
+        }
+        Schema::dropIfExists('b_units');
     }
 };
