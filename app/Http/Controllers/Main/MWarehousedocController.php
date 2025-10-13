@@ -147,4 +147,178 @@ class MWarehouseDocController extends Controller
             return $this->clientErrorResponse($e->getMessage());
         }
     }
+    ///////////////////////////////////////////////////////////////////////////////// Receive
+    public function receiveRequirment(MWarehouseController $MWarehouse )
+    {
+        $warehouses = $MWarehouse->index();
+        $invoices = $MWarehouse->index();
+        $users = $MWarehouse->index();
+
+        $invoices = DB::table('m_invoices')
+        ->select(
+            'm_invoices.invoicecode',
+            'm_invoices.pk_invoice',
+            )
+            ->join('users', 'users.id', '=', 'm_invoices.fk_registrar')
+            ->where('users.fk_company', '=', auth()->user()->fk_company)
+            ->get();
+
+        $res = [
+            "warehouses" => $warehouses,
+            "invoices" => $invoices,
+            "users" => $users,
+        ];
+
+        return $res;
+    }
+    public function createReceiveDoc(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = $request->validate([
+                'fk_warehouse' => 'nullable|integer',
+                'fk_invoice' => 'nullable|integer',
+                'fk_deliverorrecipient' => 'nullable|integer',
+                'warehousedocdate' => 'required|date',
+                'deliverorrecipient' => 'nullable|string|max:255',
+                'shipping' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'attachments' => 'nullable|file|max:5120',
+            ]);
+
+            $data['fk_registrar'] = auth()->id();
+            $data['fk_warehousedoctype'] = 1;
+
+            if ($request->hasFile('attachments')) {
+                $filename = time() . '-' . uniqid() . '.' . $request->file('attachments')->getClientOriginalExtension();
+                $attachmentPath = $request->file('attachments')->storeAs('attachments/warehousedocs', $filename, 'public');
+                $data['attachments'] = $attachmentPath;
+            }
+
+            $doc = m_warehousedoc::create($data);
+
+            DB::commit();
+            return $this->successMessage($doc);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function getReceiveDocs(Request $request)
+    {
+        if (!auth()->user()->fk_company) {
+            return $this->serverErrorResponse('Company not found for user.');
+        }
+
+        $docs = DB::table('m_warehousedocs')
+            ->select(
+                'm_warehousedocs.pk_warehousedoc',
+                'm_warehousedocs.warehousedoccode',
+                'm_warehousedocs.warehousedocdate',
+                'm_warehousedocs.description',
+                'm_warehousedocs.attachments',
+                'm_warehousedocs.deliverorrecipient',
+                'm_warehousedocs.shipping',
+                'm_invoices.invoicetitle',
+                DB::raw("CONCAT(users.name, ' ', users.lastname) as registrarfullname"),
+                'm_warehouses.warehouse'
+            )
+            ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
+            ->leftJoin('m_warehouses', 'm_warehousedocs.fk_warehouse', '=', 'm_warehouses.pk_warehouse')
+            ->leftJoin('m_invoices', 'm_warehousedocs.fk_invoice', '=', 'm_invoices.pk_invoice')
+            ->where('users.fk_company', '=', auth()->user()->fk_company)
+            ->where('m_warehousedocs.fk_warehousedoctype', '=', '1')
+            ->orderByDesc('m_warehousedocs.pk_warehousedoc')
+            ->get();
+
+        return $docs;
+    }
+    public function updateReceiveDoc(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = $request->validate([
+                'pk_warehousedoc' => 'required|integer',
+                'fk_warehouse' => 'nullable|integer',
+                'fk_invoice' => 'nullable|integer',
+                'fk_deliverorrecipient' => 'nullable|integer',
+                'warehousedocdate' => 'required|date',
+                'deliverorrecipient' => 'nullable|string|max:255',
+                'shipping' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:255',
+                'attachments' => 'nullable|file|max:5120',
+            ]);
+
+            
+            $doc = DB::table('m_warehousedocs')
+                ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
+                ->where('m_warehousedocs.pk_warehousedoc', $data['pk_warehousedoc'])
+                ->where('users.fk_company', auth()->user()->fk_company)
+                ->where('m_warehousedocs.fk_warehousedoctype', '=', '1')
+                ->select('m_warehousedocs.*')
+                ->first();
+
+            if (!$doc) {
+                return $this->serverErrorResponse('You are not allowed to update this document.');
+            }
+
+            $model = m_warehousedoc::findOrFail($data['pk_warehousedoc']);
+
+            if ($request->hasFile('attachments')) {
+                if ($model->attachments && \Storage::disk('public')->exists($model->attachments)) {
+                    \Storage::disk('public')->delete($model->attachments);
+                }
+                $filename = time() . '-' . uniqid() . '.' . $request->file('attachments')->getClientOriginalExtension();
+                $attachmentPath = $request->file('attachments')->storeAs('attachments/warehousedocs', $filename, 'public');
+                $data['attachments'] = $attachmentPath;
+            }
+
+            $model->update($data);
+
+            DB::commit();
+            return $this->successMessage($model);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function deleteReceiveDoc(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $request->validate([
+                'pk_warehousedoc' => 'required|integer',
+            ]);
+
+            
+            $doc = DB::table('m_warehousedocs')
+                ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
+                ->where('m_warehousedocs.pk_warehousedoc', $request->pk_warehousedoc)
+                ->where('users.fk_company', auth()->user()->fk_company)
+                ->where('m_warehousedocs.fk_warehousedoctype', '=', '1')
+                ->select('m_warehousedocs.*')
+                ->first();
+
+            if (!$doc) {
+                return $this->serverErrorResponse('You are not allowed to delete this document.');
+            }
+
+            $model = m_warehousedoc::findOrFail($request->pk_warehousedoc);
+
+            if ($model->attachments && \Storage::disk('public')->exists($model->attachments)) {
+                \Storage::disk('public')->delete($model->attachments);
+            }
+
+            $model->delete();
+
+            DB::commit();
+            return $this->successMessage('Document deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
 }

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             BProvinceSeeder::class,
             BCitySeeder::class,
             SMenucolumnSeeder::class,
+            BWarehousedoctypeSeeder::class,
         ]);
     }
 }
