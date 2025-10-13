@@ -251,18 +251,8 @@ class MWarehouseDocController extends Controller
                 'attachments' => 'nullable|file|max:5120',
             ]);
 
-            
-            $doc = DB::table('m_warehousedocs')
-                ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
-                ->where('m_warehousedocs.pk_warehousedoc', $data['pk_warehousedoc'])
-                ->where('users.fk_company', auth()->user()->fk_company)
-                ->where('m_warehousedocs.fk_warehousedoctype', '=', '1')
-                ->select('m_warehousedocs.*')
-                ->first();
-
-            if (!$doc) {
-                return $this->serverErrorResponse('You are not allowed to update this document.');
-            }
+            $pk = $data['pk_warehousedoc'];
+            $this->isCorrectCompany(m_warehousedoc::class,$pk);
 
             $model = m_warehousedoc::findOrFail($data['pk_warehousedoc']);
 
@@ -289,22 +279,13 @@ class MWarehouseDocController extends Controller
         DB::beginTransaction();
 
         try {
-            $request->validate([
+            $data = $request->validate([
                 'pk_warehousedoc' => 'required|integer',
             ]);
 
+            $pk = $data['pk_warehousedoc'];
+            $this->isCorrectCompany(m_warehousedoc::class,$pk);
             
-            $doc = DB::table('m_warehousedocs')
-                ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
-                ->where('m_warehousedocs.pk_warehousedoc', $request->pk_warehousedoc)
-                ->where('users.fk_company', auth()->user()->fk_company)
-                ->where('m_warehousedocs.fk_warehousedoctype', '=', '1')
-                ->select('m_warehousedocs.*')
-                ->first();
-
-            if (!$doc) {
-                return $this->serverErrorResponse('You are not allowed to delete this document.');
-            }
 
             $model = m_warehousedoc::findOrFail($request->pk_warehousedoc);
 
