@@ -17,12 +17,9 @@ class DatabaseSeeder extends Seeder
             MCompanySeeder::class,
             BAccountingsubgroupSeeder::class,
             UserSeeder::class,
-            BRoleSeeder::class,
             BInvoicetypeSeeder::class,
             BProvinceSeeder::class,
             BCitySeeder::class,
-            SMenucolumnSeeder::class,
-            BWarehousedoctypeSeeder::class,
         ]);
     }
 }
