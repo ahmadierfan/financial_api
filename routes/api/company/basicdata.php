@@ -16,7 +16,7 @@ use App\Http\Controllers\Relation\RMenusroleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('accounting/v1/company/basicdata')->group(function () {
+Route::prefix('financial/v1/company/basicdata')->group(function () {
     Route::middleware('auth:api')->group(function () {
 
         //role and access

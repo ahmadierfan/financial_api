@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             BInvoicetypeSeeder::class,
             BProvinceSeeder::class,
             BCitySeeder::class,
+            BWarehousedoctypeSeeder::class,
+
         ]);
     }
 }

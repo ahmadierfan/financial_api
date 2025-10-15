@@ -248,6 +248,25 @@ class MInvoiceController extends Controller
 
         m_invoice::whereIn('pk_invoice', $pk)->delete();
     }
+    public function index()
+    {
+        if (isset(auth()->user()->fk_company)) {
+            $invoices = DB::table('m_invoices')
+                ->select(
+                    'm_invoices.*',
+                    DB::raw("CONCAT(users.name, ' ', users.lastname) as userfullname"),
+                    DB::raw("CONCAT(registrar.name, ' ', registrar.lastname) as registrarfullname"),
+                    DB::raw("pdate(substr( `m_invoices`.`created_at`, 1, 10 )) as jalaliinvoicedocdate"),
+                    DB::raw('substr( `m_invoices`.`created_at`, 12, 5 ) AS `createdtime`')
+                )
+                ->join('users', 'm_invoices.fk_user', '=', 'users.id')
+                ->join('users AS registrar', 'm_invoices.fk_registrar', '=', 'registrar.id')
+                ->where('users.fk_company', '=', auth()->user()->fk_company)
+                ->get();
+
+            return $invoices;
+        }
+    }
     function justIndex($fk_invoicetype)
     {
         if (isset(auth()->user()->fk_company)) {
