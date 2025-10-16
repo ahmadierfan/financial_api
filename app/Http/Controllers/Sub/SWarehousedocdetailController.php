@@ -45,4 +45,8 @@ class SWarehousedocdetailController extends Controller
     {
         s_warehousedocdetail::where('fk_warehousedoc', $fk_warehousedoc)->delete();
     }
+    function deleteAllrecords($fk_warehousedoc)
+    {
+        s_warehousedocdetail::whereIn('fk_warehousedoc', $fk_warehousedoc)->delete();
+    }
 }

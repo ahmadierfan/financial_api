@@ -81,64 +81,48 @@ class MWarehouseDocController extends Controller
         }
     }
 
-    public function updateDoc(Request $request)
+    public function updateDoc(Request $request,$Swarehousedocdetail, $fk_warehousedoctype)
     {
-        try {
-            $data = $request->validate([
-                'pk_warehousedoc' => 'required|integer',
-                'fk_warehouse' => 'nullable|integer',
-                'fk_invoice' => 'nullable|integer',
-                'fk_deliverorrecipient' => 'nullable|integer',
-                'warehousedocdate' => 'required|date',
-                'warehousedoccode' => 'nullable|string|max:255',
-                'deliverorrecipient' => 'nullable|string|max:255',
-                'shipping' => 'nullable|string|max:255',
-                'description' => 'nullable|string|max:255',
-                'attachments' => 'nullable|file|max:5120',
-                'attachmentchanged' => 'nullable|boolean',
-            ]);
+        
+        $data = $request->validate([
+            'pk_warehousedoc' => 'required|integer',
+            'fk_warehouse' => 'nullable|integer',
+            'fk_invoice' => 'nullable|integer',
+            'fk_deliverorrecipient' => 'nullable|integer',
+            'warehousedocdate' => 'required|date',
+            'warehousedoccode' => 'nullable|string|max:255',
+            'deliverorrecipient' => 'nullable|string|max:255',
+            'shipping' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:255',
+            
+        ]);
 
-            $pk = $data['pk_warehousedoc'];
-            $this->isCorrectCompany(m_warehousedoc::class, [$pk]);
+        $pk = $data['pk_warehousedoc'];
+        $this->isCorrectCompany(m_warehousedoc::class, [$pk]);
 
-            $doc = m_warehousedoc::findOrFail($pk);
+        $this->checkWarehousedocType($pk, $fk_warehousedoctype);
 
-            if (isset($data['attachmentchanged']) && $data['attachmentchanged']) {
-                if ($request->hasFile('attachments')) {
-                    $filename = time() . '-' . uniqid() . '.' . $request->file('attachments')->getClientOriginalExtension();
-                    $attachmentPath = $request->file('attachments')->storeAs('attachments/warehousedocs', $filename, 'public');
-                    $data['attachments'] = $attachmentPath;
-                } else {
-                    $data['attachments'] = null;
-                }
-            } else {
-                unset($data['attachments']); // prevent overwriting
-            }
+        $doc = m_warehousedoc::findOrFail($pk);
+        $updateData = collect($data)->except('pk_warehousedoc')->toArray();
+        $doc->update($updateData);
 
-            $doc->update($data);
+        if (isset($doc->pk_warehousedoc)) {
+        $this->docRecordsCreateUpdate($request, $Swarehousedocdetail, $pk);
+        $this->checkHasFiles($request, $doc);
+        $this->docDeleteAttachment($request, $doc);
+        }   
 
-            return response()->json($doc);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->serverErrorResponse($e->getMessage());
-        }
+       
     }
 
-    public function deleteDoc(Request $request)
+    public function deleteDoc($pk,$fk_warehousedoctype,SWarehousedocdetailController $Swarehousedocdetai)
     {
-        try {
-            if (isset($request->pk)) {
-                $request->validate([
-                    'pk' => 'required|array',
-                ]);
-                $pk = $request->pk;
-                $this->isCorrectCompany(m_warehousedoc::class, $pk);
-                m_warehousedoc::whereIn('pk_warehousedoc', $pk)->delete();
-            }
-            return $this->successDelete();
-        } catch (\Exception $e) {
-            return $this->clientErrorResponse($e->getMessage());
-        }
+        $this->isCorrectCompany(m_warehousedoc::class, $pk);
+
+        $this->checkwarehousedocType($pk, $fk_warehousedoctype);
+        $Swarehousedocdetai->deleteAllrecords($pk);
+        m_warehousedoc::whereIn('pk_warehousedoc', $pk)->delete();
+
     }
     function docRecordsCreateUpdate($request, SWarehousedocdetailController $Swarehousedocdetail, $fk_warehousedoc): void
     {
@@ -225,6 +209,33 @@ class MWarehouseDocController extends Controller
             return $warehousedoc;
         }
     }
+    function checkWarehousedocType($pk_warehousedoc, $fk_warehousedoctype)
+    {
+        $data = m_warehousedoc::where('pk_warehousedoc', $pk_warehousedoc)
+            ->where('fk_warehousedoctype', $fk_warehousedoctype)
+            ->exists();
+
+        if (!$data)
+            throw new \Exception(__('messages.error.incurrect_input'));
+    }
+    function docDeleteAttachment($request, $doc)
+    {
+        if (isset($request->isForDeleteAttachment) && $request->isForDeleteAttachment != '' && isset($doc->attachments)) {
+            $oldattachments = explode(';', $doc->attachments);
+
+            $indexesToDelete = explode(',', $request->input('isForDeleteAttachment'));
+
+            foreach ($indexesToDelete as $index) {
+
+                if (is_numeric($index) && isset($oldattachments[$index])) {
+                    unset($oldattachments[$index]);
+                }
+            }
+            $doc->attachments = implode(';', array_values($oldattachments));
+            $doc->save();
+        }
+
+    }
     ///////////////////////////////////////////////////////////////////////////////// Receive
     public function receiveRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
     {
@@ -266,72 +277,35 @@ class MWarehouseDocController extends Controller
         $fk_warehousedoctype = 1;
         return $this->justIndex($fk_warehousedoctype);
     }
-    public function updateReceiveDoc(Request $request)
+    public function updateReceiveDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetail)
     {
-        DB::beginTransaction();
-
-        try {
-            $data = $request->validate([
-                'pk_warehousedoc' => 'required|integer',
-                'fk_warehouse' => 'nullable|integer',
-                'fk_invoice' => 'nullable|integer',
-                'fk_deliverorrecipient' => 'nullable|integer',
-                'warehousedocdate' => 'required|date',
-                'deliverorrecipient' => 'nullable|string|max:255',
-                'shipping' => 'nullable|string|max:255',
-                'description' => 'nullable|string|max:255',
-                'attachments' => 'nullable|file|max:5120',
-            ]);
-
-            $pk = $data['pk_warehousedoc'];
-            $this->isCorrectCompany(m_warehousedoc::class, $pk);
-
-            $model = m_warehousedoc::findOrFail($data['pk_warehousedoc']);
-
-            if ($request->hasFile('attachments')) {
-                if ($model->attachments && \Storage::disk('public')->exists($model->attachments)) {
-                    \Storage::disk('public')->delete($model->attachments);
-                }
-                $filename = time() . '-' . uniqid() . '.' . $request->file('attachments')->getClientOriginalExtension();
-                $attachmentPath = $request->file('attachments')->storeAs('attachments/warehousedocs', $filename, 'public');
-                $data['attachments'] = $attachmentPath;
-            }
-
-            $model->update($data);
+       try {
+            DB::beginTransaction();
+            $fk_warehousedoctype = 1;
+            $this->updateDoc($request, $Swarehousedocdetail, $fk_warehousedoctype);
 
             DB::commit();
-            return $this->successMessage($model);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->serverErrorResponse($e->getMessage());
         }
     }
-    public function deleteReceiveDoc(Request $request)
+    public function deleteReceiveDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetai)
     {
-        DB::beginTransaction();
-
         try {
-            $data = $request->validate([
-                'pk' => 'required',
-            ]);
+            if (isset($request->pk)) {
+                $data = $request->validate([
+                    'pk' => 'required|array'
+                ]);
 
-            $pk = $data['pk'];
-            $this->isCorrectCompany(m_warehousedoc::class, $pk);
+                $pk = $data['pk'];
 
+                $this->deleteDoc($pk, 1,$Swarehousedocdetai);
 
-            $model = m_warehousedoc::findOrFail($request->pk_warehousedoc);
-
-            if ($model->attachments && \Storage::disk('public')->exists($model->attachments)) {
-                \Storage::disk('public')->delete($model->attachments);
+                return $this->successDelete();
             }
-
-            $model->delete();
-
-            DB::commit();
-            return $this->successMessage('Document deleted successfully.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->serverErrorResponse($e->getMessage());
+            return $this->clientErrorResponse($e->getMessage());
         }
     }
 }
