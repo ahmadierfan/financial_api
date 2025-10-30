@@ -1,9 +1,7 @@
 <?php
 
-use App\Http\Controllers\Base\BRoleController;
 use App\Http\Controllers\Base\BBankController;
 use App\Http\Controllers\Base\BUnitController;
-use App\Http\Controllers\Base\BMenuController;
 use App\Http\Controllers\Main\MBankaccountController;
 use App\Http\Controllers\Base\BProductcategoryController;
 use App\Http\Controllers\Main\MMoneyboxController;
@@ -11,32 +9,11 @@ use App\Http\Controllers\Main\MProductController;
 use App\Http\Controllers\Main\MWarehouseController;
 use App\Http\Controllers\Sub\SUseraddressController;
 use App\Http\Controllers\Sub\SUserloginController;
-use App\Http\Controllers\Relation\RUsersroleController;
-use App\Http\Controllers\Relation\RMenusroleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('financial/v1/company/basicdata')->group(function () {
     Route::middleware('auth:api')->group(function () {
-
-        //role and access
-        Route::get('roles', [BRoleController::class, 'index']);
-        Route::post('create-role', [BRoleController::class, 'createRole']);
-        Route::post('update-role', [BRoleController::class, 'updateRole']);
-
-        Route::post('add-user-to-role', [RUsersroleController::class, 'addUserToRole']);
-        Route::delete('delete-role', [BRoleController::class, 'deleteRole']);
-
-        Route::get('user-roles', [RUsersroleController::class, 'userRoles']);
-        Route::get('role-users', [RUsersroleController::class, 'roleUsers']);
-        Route::delete('delete-role-from-user', [RUsersroleController::class, 'deleteUser']);
-
-        //menu
-        Route::delete('delete-menu-from-role', [RMenusroleController::class, 'delete']);
-        Route::post('add-menu-to-role', [RMenusroleController::class, 'create']);
-        Route::get('role-menus', [RMenusroleController::class, 'roleMenus']);
-        Route::get('menus', [BMenuController::class, 'index']);
-
         //user managment
         Route::post('create-user', [UserController::class, 'createUser']);
         Route::post('update-user', [UserController::class, 'updateUser']);
