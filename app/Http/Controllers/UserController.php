@@ -156,7 +156,7 @@ class UserController extends Controller
         if (isset(auth()->user()->fk_company)) {
             $data = User::select(
                 'users.*',
-                DB::Raw('CONCAT(users.name," ",users.lastname) userfullname')
+                DB::Raw('CONCAT_WS(" ",users.name,users.lastname) userfullname')
             )
                 ->where('fk_company', auth()->user()->fk_company)
                 ->get();

@@ -8,7 +8,6 @@ use App\Http\Controllers\Main\MMoneyboxController;
 use App\Http\Controllers\Main\MProductController;
 use App\Http\Controllers\Main\MWarehouseController;
 use App\Http\Controllers\Sub\SUseraddressController;
-use App\Http\Controllers\Sub\SUserloginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,8 +65,5 @@ Route::prefix('financial/v1/company/basicdata')->group(function () {
         Route::post('update-product-category', [BProductcategoryController::class, 'update']);
         Route::delete('delete-product-category', [BProductcategoryController::class, 'delete']);
         Route::get('product-categories', [BProductcategoryController::class, 'forCompany']);
-
-        //User Logins
-        Route::get('user-logins', [SUserloginController::class, 'index']);
     });
 });

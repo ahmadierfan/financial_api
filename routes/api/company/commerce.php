@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main\MInvoiceController;
 
 Route::prefix('financial/v1/company/commerce')->group(function () {
-    Route::middleware(['auth:api', 'userPermission'])->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
 
         //sale invoice
         Route::get('sale-invoices', [MInvoiceController::class, 'saleInvoices']);

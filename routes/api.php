@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Systems\Crm;
-use App\Http\Controllers\Systems\Homeease;
-use App\Http\Controllers\Base\BMenuController;
-use App\Http\Controllers\Sub\SMenucolumnController;
 
-
+Route::prefix('financial/v1')->group(function () {
+    Route::middleware(['auth:api'])->group(function () {
+        Route::get('profile', [AuthController::class, 'profile']);
+    });
+    Route::prefix('auth')->group(function () {
+        Route::post('login', [AuthController::class, 'login'])->name('login');
+    });
+});

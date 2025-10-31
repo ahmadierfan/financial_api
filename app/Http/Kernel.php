@@ -24,11 +24,6 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\Localization::class,
     ];
 
-
-    protected $routeMiddleware = [
-        'userPermission' => \App\Http\Middleware\ChecUserPermission::class,
-    ];
-
     /**
      * The application's route middleware groups.
      *
@@ -46,7 +41,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
