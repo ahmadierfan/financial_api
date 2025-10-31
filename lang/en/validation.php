@@ -216,6 +216,23 @@ return [
         // b_accountingsubgroups
         'accountingsubgroup' => 'Accounting Subgroup',
 
+        // m_warehousedocs
+        'm_warehousedocs' => 'Warehouse Documents',
+        'pk_warehousedoc' => 'Warehouse Document ID',
+        'fk_registrar' => 'Registrar',
+        'fk_warehousedoctype' => 'Warehouse Document Type',
+        'fk_warehouse' => 'Warehouse',
+        'fk_destinationwarehouse' => 'Destination Warehouse',
+        'fk_system' => 'System',
+        'fk_invoice' => 'Invoice',
+        'fk_deliverorrecipient' => 'Deliverer or Recipient',
+        'warehousedocdate' => 'Warehouse Document Date',
+        'warehousedoccode' => 'Warehouse Document Code',
+        'deliverorrecipient' => 'Deliverer or Recipient',
+        'shipping' => 'Shipping',
+        'description' => 'Description',
+        'attachments' => 'Attachments',
+
         // b_apis
         'api' => 'API',
         'fk_apitype' => 'API Type',
@@ -293,7 +310,6 @@ return [
         'invoicecode' => 'Invoice Code',
         'invoicedocdate' => 'Invoice Document Date',
         'duedate' => 'Due Date',
-        'shipping' => 'Shipping',
 
         // m_products
         'product' => 'Product',
@@ -323,6 +339,131 @@ return [
         'password' => 'Password',
         'notificationtoken' => 'Notification Token',
         'isblock' => 'Is Block',
+
+
+        // ========== m_checkbooks ==========
+        'm_checkbooks' => 'Checkbooks',
+        'pk_checkbook' => 'Checkbook ID',
+        'fk_bank' => 'Bank',
+
+        // ========== m_financialrequests ==========
+        'm_financialrequests' => 'Financial Requests',
+        'pk_financialrequest' => 'Financial Request ID',
+
+        // ========== m_moneyboxes ==========
+        'm_moneyboxes' => 'Money Boxes',
+        'pk_moneybox' => 'Money Box ID',
+        'fk_accountingsub' => 'Accounting Sub',
+        'moneybox' => 'Money Box',
+
+        // ========== m_pettycashes ==========
+        'm_pettycashes' => 'Petty Cashes',
+        'pk_pettycach' => 'Petty Cash ID',
+        'pettycach' => 'Petty Cash',
+
+        // ========== m_verifications ==========
+        'm_verifications' => 'Verifications',
+        'pk_verification' => 'Verification ID',
+        'verificationcode' => 'Verification Code',
+
+        // ========== m_warehouses ==========
+        'm_warehouses' => 'Warehouses',
+        'pk_warehouse' => 'Warehouse ID',
+        'fk_user' => 'User',
+        'warehouse' => 'Warehouse',
+        'warehousesec' => 'Warehouse Secondary',
+        'warehousecode' => 'Warehouse Code',
+        'address' => 'Address',
+
+        // ========== r_usercompanies ==========
+        'r_usercompanies' => 'User Companies',
+        'pk_usercompany' => 'User Company ID',
+        'fk_company' => 'Company',
+        'crated_at' => 'Created At',
+
+        // ========== r_warehouseproducts ==========
+        'r_warehouseproducts' => 'Warehouse Products',
+        'pk_warehouseproduct' => 'Warehouse Product ID',
+        'fk_product' => 'Product',
+
+        // ========== s_accountingdocdetails ==========
+        's_accountingdocdetails' => 'Accounting Document Details',
+        'pk_accountingdocdetail' => 'Accounting Doc Detail ID',
+        'fk_accountingdoc' => 'Accounting Document',
+        'fk_coding' => 'Coding',
+        'amount' => 'Amount',
+
+        // ========== s_accountingsubs ==========
+        's_accountingsubs' => 'Accounting Subs',
+        'pk_accountingsub' => 'Accounting Sub ID',
+        'fk_accountingsubgreoup' => 'Accounting Subgroup',
+        'accountingsub' => 'Accounting Sub',
+        'accountingsubcode' => 'Accounting Sub Code',
+
+        // ========== s_checkbookdetails ==========
+        's_checkbookdetails' => 'Checkbook Details',
+        'pk_checkbookdetail' => 'Checkbook Detail ID',
+        'fk_checkbook' => 'Checkbook',
+        'serialnumber' => 'Serial Number',
+
+        // ========== s_finacialreqdetails ==========
+        's_finacialreqdetails' => 'Financial Request Details',
+        'pk_finacialreqdetail' => 'Financial Request Detail ID',
+        'fk_financialrequest' => 'Financial Request',
+        'fk_cheque' => 'Cheque',
+
+        // ========== s_invoicedetails ==========
+        's_invoicedetails' => 'Invoice Details',
+        'pk_invoicedetail' => 'Invoice Detail ID',
+        'feeprice' => 'Fee Price',
+        'count' => 'Count',
+        'totalprice' => 'Total Price',
+        'discountpercent' => 'Discount Percent',
+        'discountamount' => 'Discount Amount',
+        'taxpercent' => 'Tax Percent',
+        'taxamount' => 'Tax Amount',
+        'finalprice' => 'Final Price',
+        'expiredate' => 'Expire Date',
+
+        // ========== s_menucolumns ==========
+        's_menucolumns' => 'Menu Columns',
+        'pk_menucolumn' => 'Menu Column ID',
+        'fk_menu' => 'Menu',
+        'field' => 'Field',
+        'label' => 'Label',
+        'labelsec' => 'Secondary Label',
+        'isnumeric' => 'Is Numeric',
+        'isprice' => 'Is Price',
+        'ishtml' => 'Is HTML',
+        'isimage' => 'Is Image',
+        'isshowinmobile' => 'Show In Mobile',
+
+        // ========== s_useraddresses ==========
+        's_useraddresses' => 'User Addresses',
+        'pk_useraddress' => 'User Address ID',
+        'fk_currentprvince' => 'Current Province',
+        'useraddress' => 'User Address',
+        'postal_address' => 'Postal Address',
+        'address_compact' => 'Compact Address',
+        'last' => 'Last Name',
+        'country' => 'Country',
+        'rural_district' => 'Rural District',
+        'village' => 'Village',
+        'region' => 'Region',
+        'neighborhood' => 'Neighborhood',
+        'street' => 'Street',
+        'plaque' => 'Plaque',
+        'postal_code' => 'Postal Code',
+        'lat' => 'Latitude',
+        'lon' => 'Longitude',
+        'type' => 'Type',
+        'coordinates' => 'Coordinates',
+        'floorunit' => 'Floor/Unit',
+
+        // ========== s_warehousedocdetails ==========
+        's_warehousedocdetails' => 'Warehouse Document Details',
+        'pk_warehousedocdetail' => 'Warehouse Document Detail ID',
+        'fk_warehousedoc' => 'Warehouse Document',
 
     ],
 
