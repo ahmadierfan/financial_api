@@ -12,21 +12,29 @@ trait ResponseTrait
             return true;
         return false;
     }
-    function isCorrectCompany($modelClass, $receivedPks)
+    function isCorrectCompany($modelClass, $receivedPks,$isuser = false)
     {
+        $receivedPks = is_array($receivedPks) ? $receivedPks : [$receivedPks];
         if (isset(auth()->user()->fk_company)) {
             $model = new $modelClass;
 
             $primaryKey = $model->getKeyName();
-
-            $counter = $modelClass::whereIn($primaryKey, $receivedPks)
-                ->join('users as registrar', $model->getTable() . '.fk_registrar', '=', 'registrar.id')
-                ->where('registrar.fk_company', auth()->user()->fk_company)
-                ->count();
+            if($isuser)
+                $counter = $modelClass::whereIn($primaryKey, $receivedPks)
+                    ->where('fk_company', auth()->user()->fk_company)
+                    ->count();
+            else
+                $counter = $modelClass::whereIn($primaryKey, $receivedPks)
+                    ->join('users as registrar', $model->getTable() . '.fk_registrar', '=', 'registrar.id')
+                    ->where('registrar.fk_company', auth()->user()->fk_company)
+                    ->count();
 
             if ($counter == 0)
                 throw new \Exception(__('messages.error.invalid_company'));
-            return true;
+            elseif ($counter >= count($receivedPks))
+                return true;
+            else
+                throw new \Exception(__('messages.error.invalid_company'));
         }
     }
     function successDelete()

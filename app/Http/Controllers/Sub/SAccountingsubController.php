@@ -75,6 +75,7 @@ class SAccountingsubController extends Controller
     }
     function justUpdateCode($pk_accountingsub, $accountingsubcode, $accountingsub)
     {
+        $this->isCorrectCompany(s_accountingsub::class,$pk_accountingsub);
         s_accountingsub::where('pk_accountingsub', $pk_accountingsub)
             ->update([
                 'accountingsub' => $accountingsub,
@@ -83,6 +84,7 @@ class SAccountingsubController extends Controller
     }
     function updateWithPk($pk_accountingsub, $accountingsubcode, $accountingsub)
     {
+        $this->isCorrectCompany(s_accountingsub::class,$pk_accountingsub);
         s_accountingsub::where('pk_accountingsub', $pk_accountingsub)->update([
             "accountingsubcode" => $accountingsubcode,
             "accountingsub" => $accountingsub,

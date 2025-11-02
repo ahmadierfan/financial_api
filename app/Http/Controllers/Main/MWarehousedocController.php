@@ -143,6 +143,7 @@ class MWarehouseDocController extends Controller
     }
     function updateField($pk_warehousedoc, $field, $value)
     {
+        $this->isCorrectCompany(m_warehousedoc::class,$pk_warehousedoc);
         m_warehousedoc::where('pk_warehousedoc', $pk_warehousedoc)->update([$field => $value]);
     }
     function checkHasFiles($request, $warehousedoc)

@@ -99,7 +99,7 @@ class MMoneyboxController extends Controller
             if (isset($request->pk)) {
                 $pk = $request->pk;
 
-                $this->isCorrectCompany(\App\Models\m_moneybox::class, [$pk]);
+                $this->isCorrectCompany(m_moneybox::class, $pk);
 
                 m_moneybox::whereIn('pk_moneybox', $pk)->delete();
 

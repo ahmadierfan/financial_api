@@ -426,6 +426,7 @@ class MInvoiceController extends Controller
     }
     function updateField($pk_invoice, $field, $value)
     {
+        $this->isCorrectCompany(m_invoice::class,[$pk_invoice]);
         m_invoice::where('pk_invoice', $pk_invoice)->update([$field => $value]);
     }
     function checkInvoiceType($pk_invoice, $fk_invoicetype)

@@ -52,7 +52,7 @@ class BUnitController extends Controller
             ]);
             $pk = $data['pk_unit'];
 
-            $this->isCorrectCompany(\App\Models\b_unit::class, [$pk]);
+            $this->isCorrectCompany(b_unit::class, [$pk]);
 
             $unit = b_unit::findOrFail($pk);
 

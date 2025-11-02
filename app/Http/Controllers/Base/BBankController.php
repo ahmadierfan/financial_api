@@ -57,7 +57,7 @@ class BBankController extends Controller
 
             $pk = $data['pk_bank'];
 
-            $this->isCorrectCompany(\App\Models\b_bank::class, [$pk]);
+            $this->isCorrectCompany(b_bank::class, [$pk]);
 
             $bank = b_bank::findOrFail($pk);
 
