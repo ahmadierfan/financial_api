@@ -196,11 +196,13 @@ class MWarehouseDocController extends Controller
                     'm_warehousedocs.*',
                     'm_warehouses.warehouse',
                     'm_invoices.invoicecode',
+                    DB::raw("CONCAT(deliverorrecipientuser.name, ' ', deliverorrecipientuser.lastname) as deliverorrecipientfullname"),
                     DB::raw("CONCAT(users.name, ' ', users.lastname) as registrarfullname"),
                     DB::raw("pdate(substr( `m_warehousedocs`.`created_at`, 1, 10 )) as jalaliwarehousedocdate"),
                     DB::raw('substr( `m_warehousedocs`.`created_at`, 12, 5 ) AS `createdtime`')
                 )
                 ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
+                ->join('users as deliverorrecipientuser', 'm_warehousedocs.fk_deliverorrecipient', '=', 'deliverorrecipientuser.id')
                 ->where('users.fk_company', '=', auth()->user()->fk_company)
                 ->leftJoin('m_warehouses', 'm_warehouses.pk_warehouse', '=', 'm_warehousedocs.fk_warehouse')
                 ->leftJoin('m_invoices', 'm_invoices.pk_invoice', '=', 'm_warehousedocs.fk_invoice')
@@ -302,6 +304,78 @@ class MWarehouseDocController extends Controller
                 $pk = $data['pk'];
 
                 $this->deleteDoc($pk, 1,$Swarehousedocdetai);
+
+                return $this->successDelete();
+            }
+        } catch (\Exception $e) {
+            return $this->clientErrorResponse($e->getMessage());
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////// Exit
+    public function exitRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
+    {
+        $warehouses = $MWarehouse->index();
+        $invoices = $MWarehouse->index();
+        $users = $MWarehouse->index();
+        $units = $BUnit->forCompany();
+        $invoices = $Minvoice->index();
+        $records = null;
+
+        if (isset($request->warehousedocid))
+            $records = $Swarehousedocdetail->recordsForWarehousedoc($request->warehousedocid);
+
+        $res = [
+            "warehouses" => $warehouses,
+            "invoices" => $invoices,
+            "users" => $users,
+            "units" => $units,
+            "records" => $records ?? null,
+        ];
+
+        return $res;
+    }
+    public function createExitDoc(Request $request, SWarehousedocdetailController $Swarehousedocdetail)
+    {
+        try {
+            DB::beginTransaction();
+            $fk_warehousedoctype = 3;
+            $this->createDoc($request, $Swarehousedocdetail, $fk_warehousedoctype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function getExitDocs(Request $request)
+    {
+        $fk_warehousedoctype = 3;
+        return $this->justIndex($fk_warehousedoctype);
+    }
+    public function updateExitDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetail)
+    {
+       try {
+            DB::beginTransaction();
+            $fk_warehousedoctype = 3;
+            $this->updateDoc($request, $Swarehousedocdetail, $fk_warehousedoctype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function deleteExitDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetai)
+    {
+        try {
+            if (isset($request->pk)) {
+                $data = $request->validate([
+                    'pk' => 'required|array'
+                ]);
+
+                $pk = $data['pk'];
+
+                $this->deleteDoc($pk, 3,$Swarehousedocdetai);
 
                 return $this->successDelete();
             }
