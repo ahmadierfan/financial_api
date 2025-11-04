@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Main\MWarehouseController;
 use App\Http\Controllers\Base\BUnitController;
 use App\Http\Controllers\Main\MInvoiceController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Sub\SWarehousedocdetailController;
 use App\Traits\ResponseTrait;
 use App\Models\m_warehousedoc;
@@ -244,11 +245,10 @@ class MWarehouseDocController extends Controller
 
     }
     ///////////////////////////////////////////////////////////////////////////////// Receive
-    public function receiveRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
+    public function receiveRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail,UserController $User)
     {
         $warehouses = $MWarehouse->index();
-        $invoices = $MWarehouse->index();
-        $users = $MWarehouse->index();
+        $users = $User->forCompany();
         $units = $BUnit->forCompany();
         $invoices = $Minvoice->index();
         $records = null;
@@ -316,11 +316,10 @@ class MWarehouseDocController extends Controller
         }
     }
     ///////////////////////////////////////////////////////////////////////////////// Exit
-    public function exitRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
+    public function exitRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail,UserController $User)
     {
         $warehouses = $MWarehouse->index();
-        $invoices = $MWarehouse->index();
-        $users = $MWarehouse->index();
+        $users = $User->forCompany();
         $units = $BUnit->forCompany();
         $invoices = $Minvoice->index();
         $records = null;
@@ -388,11 +387,10 @@ class MWarehouseDocController extends Controller
         }
     }
     ///////////////////////////////////////////////////////////////////////////////// Transfer
-    public function transferRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
+    public function transferRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail,UserController $User)
     {
         $warehouses = $MWarehouse->index();
-        $invoices = $MWarehouse->index();
-        $users = $MWarehouse->index();
+        $users = $User->forCompany();
         $units = $BUnit->forCompany();
         $invoices = $Minvoice->index();
         $records = null;
