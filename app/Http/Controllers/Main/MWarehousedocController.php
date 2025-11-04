@@ -61,6 +61,7 @@ class MWarehouseDocController extends Controller
 
         $data = $request->validate([
             'fk_warehouse' => 'nullable|integer',
+            'fk_destinationwarehouse' => 'nullable|integer',
             'fk_invoice' => 'nullable|integer',
             'fk_deliverorrecipient' => 'nullable|integer',
             'warehousedocdate' => 'required|date',
@@ -87,6 +88,7 @@ class MWarehouseDocController extends Controller
         $data = $request->validate([
             'pk_warehousedoc' => 'required|integer',
             'fk_warehouse' => 'nullable|integer',
+            'fk_destinationwarehouse' => 'nullable|integer',
             'fk_invoice' => 'nullable|integer',
             'fk_deliverorrecipient' => 'nullable|integer',
             'warehousedocdate' => 'required|date',
@@ -195,6 +197,7 @@ class MWarehouseDocController extends Controller
                 ->select(
                     'm_warehousedocs.*',
                     'm_warehouses.warehouse',
+                    'destinationwarehouse.warehouse as destinationwarehousename',
                     'm_invoices.invoicecode',
                     DB::raw("CONCAT(deliverorrecipientuser.name, ' ', deliverorrecipientuser.lastname) as deliverorrecipientfullname"),
                     DB::raw("CONCAT(users.name, ' ', users.lastname) as registrarfullname"),
@@ -202,9 +205,10 @@ class MWarehouseDocController extends Controller
                     DB::raw('substr( `m_warehousedocs`.`created_at`, 12, 5 ) AS `createdtime`')
                 )
                 ->join('users', 'm_warehousedocs.fk_registrar', '=', 'users.id')
-                ->join('users as deliverorrecipientuser', 'm_warehousedocs.fk_deliverorrecipient', '=', 'deliverorrecipientuser.id')
+                ->leftJoin('users as deliverorrecipientuser', 'm_warehousedocs.fk_deliverorrecipient', '=', 'deliverorrecipientuser.id')
                 ->where('users.fk_company', '=', auth()->user()->fk_company)
                 ->leftJoin('m_warehouses', 'm_warehouses.pk_warehouse', '=', 'm_warehousedocs.fk_warehouse')
+                ->leftJoin('m_warehouses as destinationwarehouse', 'destinationwarehouse.pk_warehouse', '=', 'm_warehousedocs.fk_destinationwarehouse')
                 ->leftJoin('m_invoices', 'm_invoices.pk_invoice', '=', 'm_warehousedocs.fk_invoice')
                 ->where('fk_warehousedoctype', $fk_warehousedoctype)
                 ->get();
@@ -376,6 +380,78 @@ class MWarehouseDocController extends Controller
                 $pk = $data['pk'];
 
                 $this->deleteDoc($pk, 3,$Swarehousedocdetai);
+
+                return $this->successDelete();
+            }
+        } catch (\Exception $e) {
+            return $this->clientErrorResponse($e->getMessage());
+        }
+    }
+    ///////////////////////////////////////////////////////////////////////////////// Transfer
+    public function transferRequirment(Request $request,MWarehouseController $MWarehouse, BUnitController $BUnit, MInvoiceController $Minvoice,SWarehousedocdetailController $Swarehousedocdetail)
+    {
+        $warehouses = $MWarehouse->index();
+        $invoices = $MWarehouse->index();
+        $users = $MWarehouse->index();
+        $units = $BUnit->forCompany();
+        $invoices = $Minvoice->index();
+        $records = null;
+
+        if (isset($request->warehousedocid))
+            $records = $Swarehousedocdetail->recordsForWarehousedoc($request->warehousedocid);
+
+        $res = [
+            "warehouses" => $warehouses,
+            "invoices" => $invoices,
+            "users" => $users,
+            "units" => $units,
+            "records" => $records ?? null,
+        ];
+
+        return $res;
+    }
+    public function createTransferDoc(Request $request, SWarehousedocdetailController $Swarehousedocdetail)
+    {
+        try {
+            DB::beginTransaction();
+            $fk_warehousedoctype = 2;
+            $this->createDoc($request, $Swarehousedocdetail, $fk_warehousedoctype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function getTransferDocs(Request $request)
+    {
+        $fk_warehousedoctype = 2;
+        return $this->justIndex($fk_warehousedoctype);
+    }
+    public function updateTransferDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetail)
+    {
+       try {
+            DB::beginTransaction();
+            $fk_warehousedoctype = 2;
+            $this->updateDoc($request, $Swarehousedocdetail, $fk_warehousedoctype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function deleteTransferDoc(Request $request,SWarehousedocdetailController $Swarehousedocdetai)
+    {
+        try {
+            if (isset($request->pk)) {
+                $data = $request->validate([
+                    'pk' => 'required|array'
+                ]);
+
+                $pk = $data['pk'];
+
+                $this->deleteDoc($pk, 2,$Swarehousedocdetai);
 
                 return $this->successDelete();
             }

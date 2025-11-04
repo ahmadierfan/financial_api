@@ -18,5 +18,11 @@ Route::prefix('financial/v1/company/warehouse')->group(function () {
         Route::delete('delete-exit-doc', [MWarehousedocController::class, 'deleteExitDoc']);
         Route::post('update-exit-doc', [MWarehousedocController::class, 'updateExitDoc']);
         Route::get('exit-requirment', [MWarehousedocController::class, 'exitRequirment']);
+        // transfer
+        Route::get('get-transfer-docs', [MWarehousedocController::class, 'getTransferDocs']);
+        Route::post('create-transfer-doc', [MWarehousedocController::class, 'createTransferDoc']);
+        Route::delete('delete-transfer-doc', [MWarehousedocController::class, 'deleteTransferDoc']);
+        Route::post('update-transfer-doc', [MWarehousedocController::class, 'updateTransferDoc']);
+        Route::get('transfer-requirment', [MWarehousedocController::class, 'transferRequirment']);
     });
 });
