@@ -15,8 +15,16 @@ class CreateMFinancialRequestsTable extends Migration
             $table->collation = 'utf8mb4_persian_ci';
             $table->bigIncrements('pk_financialrequest');
             $table->foreignId('fk_registrar')->constrained('users');
+            $table->foreignId('fk_financialrequesttype')->nullable()->constrained('b_financialrequeststypes','pk_financialrequesttype');
+            $table->foreignId('fk_invoice')->nullable()->constrained('m_invoices', 'pk_invoice');
+            $table->foreignId('fk_payerorreceiver')->nullable()->constrained('users');
+            $table->date('financialrequestdate');
+            $table->bigInteger('price')->nullable();
+            $table->string('title')->nullable();
+            $table->string('description', 145)->nullable();
+            $table->string('attachments', 145)->nullable();
             $table->tinyInteger('isenable')->default(1);
-            $table->timestamps(0); // برای ایجاد `created_at` و `updated_at`
+            $table->timestamps(0); 
         });
 
 

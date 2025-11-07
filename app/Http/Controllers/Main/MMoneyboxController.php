@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class MMoneyboxController extends Controller
 {
     use ResponseTrait;
-    public function forCompany(Request $request)
+    public function forCompany()
     {
         if (isset(auth()->user()->fk_company)) {
             $moneyboxes = DB::table('m_moneyboxes')

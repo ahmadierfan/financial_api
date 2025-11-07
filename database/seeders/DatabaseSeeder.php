@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             BProvinceSeeder::class,
             BCitySeeder::class,
             BWarehousedoctypeSeeder::class,
+            BFinancialrequeststypeSeeder::class,
+            BFinancialpaymentmethodSeeder::class,
 
         ]);
     }

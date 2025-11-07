@@ -26,7 +26,7 @@ Route::prefix('financial/v1/company/basicdata')->group(function () {
         Route::post('create-bank-account', [MBankaccountController::class, 'createBankAccount']);
         Route::post('update-bank-account', [MBankaccountController::class, 'updateBankAccount']);
         Route::delete('delete-bank-account', [MBankaccountController::class, 'deleteBankAccount']);
-        Route::get('bank-accounts', [MBankaccountController::class, 'getBankAccounts']);
+        Route::get('bank-accounts', [MBankaccountController::class, 'forCompany']);
 
         // Unit Routes
         Route::post('create-unit', [BUnitController::class, 'createUnit']);

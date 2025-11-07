@@ -16,9 +16,11 @@ class CreateSFinacialreqdetailsTable extends Migration
             $table->bigIncrements('pk_finacialreqdetail');
             $table->foreignId('fk_registrar')->constrained('users', 'id');
             $table->foreignId('fk_financialrequest')->constrained('m_financialrequests', 'pk_financialrequest');
+            $table->foreignId('fk_financialpaymentmethods')->constrained('b_financialpaymentmethods', 'pk_financialpaymentmethod');
             $table->foreignId('fk_cheque')->nullable()->constrained('s_checkbookdetails', 'pk_checkbookdetail');
-            $table->bigInteger('amount');
-            $table->date('duedate')->nullable();
+            $table->foreignId('fk_moneybox')->nullable()->constrained('m_moneyboxes', 'pk_moneybox');
+            $table->foreignId('fk_bankaccount')->nullable()->constrained('m_bankaccounts', 'pk_bankaccount');
+            $table->bigInteger('price');
             $table->tinyInteger('isenable')->default(1);
             $table->timestamps(0);
             $table->index('fk_financialrequest');

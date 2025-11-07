@@ -16,9 +16,12 @@ class CreateSCheckbookdetailsTable extends Migration
             $table->bigIncrements('pk_checkbookdetail');
             $table->foreignId('fk_registrar')->constrained('users', 'id');
             $table->foreignId('fk_checkbook')->constrained('m_checkbooks', 'pk_checkbook');
-            $table->string('serialnumber', 45)->nullable();
+            $table->string('checknumber', 45)->nullable();
+            $table->string('sayadnumber', 45)->nullable();
             $table->date('duedate')->nullable();
+            $table->bigInteger('price');
             $table->tinyInteger('isenable')->default(1);
+
             $table->timestamps(0);
             $table->index('fk_checkbook');
         });

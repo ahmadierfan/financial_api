@@ -13,7 +13,7 @@ class MBankaccountController extends Controller
 {
     use ResponseTrait;
 
-    public function getBankAccounts(Request $request)
+    public function forCompany()
     {
         if (isset(auth()->user()->fk_company)) {
             $bankAccounts = DB::table('m_bankaccounts')
