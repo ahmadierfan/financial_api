@@ -11,5 +11,11 @@ Route::prefix('financial/v1/company/treasury')->group(function () {
         Route::delete('delete-receive-doc', [MFinancialrequestController::class, 'deleteReceiveDoc']);
         Route::post('update-receive-doc', [MFinancialrequestController::class, 'updateReceiveDoc']);
         Route::get('receive-requirment', [MFinancialrequestController::class, 'receiveRequirment']);
+        // payment
+        Route::get('get-payment-docs', [MFinancialrequestController::class, 'getPaymentDocs']);
+        Route::post('create-payment-doc', [MFinancialrequestController::class, 'createPaymentDoc']);
+        Route::delete('delete-payment-doc', [MFinancialrequestController::class, 'deletePaymentDoc']);
+        Route::post('update-payment-doc', [MFinancialrequestController::class, 'updatepaymentDoc']);
+        Route::get('payment-requirment', [MFinancialrequestController::class, 'paymentRequirment']);
     });
 });

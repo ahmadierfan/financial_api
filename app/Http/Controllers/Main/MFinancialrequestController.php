@@ -11,6 +11,7 @@ use App\Http\Controllers\Base\BFinancialpaymentmethodController;
 use App\Http\Controllers\Main\MInvoiceController;
 use App\Http\Controllers\Main\MMoneyboxController;
 use App\Http\Controllers\Main\MBankaccountController;
+use App\Http\Controllers\Main\MCheckbookController;
 use App\Http\Controllers\UserController;
 use App\Models\m_warehousedoc;
 use Illuminate\Http\Request;
@@ -117,7 +118,7 @@ class MFinancialrequestController extends Controller
             $doc->save();
         }
     }
-    function docRecordsCreate($request, SFinacialreqdetailController $SFinacialreqdetail, $fk_financialrequest): void
+    function docRecordsCreate($request, SFinacialreqdetailController $SFinacialreqdetail, $fk_financialrequest,$fk_financialrequesttype): void
     {
         if (isset($request->records)) {
 
@@ -128,6 +129,7 @@ class MFinancialrequestController extends Controller
             if (!is_array($records))
                 $records = json_decode($records, true);
             foreach ($records as $record) {
+                $record['fk_financialrequesttype'] = $fk_financialrequesttype;
                 $SFinacialreqdetail->justCreate($record, $fk_financialrequest);
                     
             }
@@ -167,8 +169,8 @@ class MFinancialrequestController extends Controller
 
         $doc = m_financialrequest::create($data);
         if (isset($doc->pk_financialrequest)) {
-            $this->docRecordsCreateUpdate($request, $Sfinancialrequestdetail, $doc->pk_financialrequest);
-            //$this->checkHasFiles($request, $doc);
+            $this->docRecordsCreate($request, $Sfinancialrequestdetail, $doc->pk_financialrequest, $fk_financialrequesttype);
+            $this->checkHasFiles($request, $doc);
         }
     }
 
@@ -198,8 +200,8 @@ class MFinancialrequestController extends Controller
 
         if (isset($doc->pk_financialrequest)) {
             $this->docRecordsUpdate($request, $Sfinancialrequestdetail, $pk);
-            // $this->checkHasFiles($request, $doc);
-            // $this->docDeleteAttachment($request, $doc);
+            $this->checkHasFiles($request, $doc);
+            $this->docDeleteAttachment($request, $doc);
         }
     }
 
@@ -285,6 +287,84 @@ class MFinancialrequestController extends Controller
     public function getReceiveDocs(Request $request)
     {
         $fk_financialrequesttype = 1;
+        return $this->justIndex($fk_financialrequesttype);
+    }
+    ////////////////////////////////////////////////////////////////////////// Payment
+    public function paymentRequirment(Request $request, MCheckbookController $Mcheckbook, MInvoiceController $Minvoice, SFinacialreqdetailController $Sfinancialreqdetail, UserController $User, MMoneyboxController $Moneybox, MBankaccountController $Bankaccount, BFinancialpaymentmethodController $Method)
+    {
+        $tabs = $Method->getMethods();
+        $bankaccounts = $Bankaccount->forCompany();
+        $moneyboxes = $Moneybox->forCompany();
+        $users = $User->forCompany();
+        $receivechecks = $Mcheckbook->justIndex(1);
+        $invoices = $Minvoice->index();
+        $records = null;
+
+        if (isset($request->financialreqid)){
+            $this->isCorrectCompany(m_financialrequest::class,$request->financialreqid);
+            $records = $Sfinancialreqdetail->recordsForFinancialreq($request->financialreqid);
+        }
+            
+
+        $res = [
+            "tabs" => $tabs,
+            "bankaccounts" => $bankaccounts,
+            "moneyboxes" => $moneyboxes,
+            "invoices" => $invoices,
+            "receivechecks" => $receivechecks,
+            "users" => $users,
+            "records" => $records ?? null,
+        ];
+
+        return $res;
+    }
+    public function createPaymentDoc(Request $request, SFinacialreqdetailController $Sfinancialreqdetail)
+    {
+        try {
+            DB::beginTransaction();
+            $fk_financialrequesttype = 2;
+            $this->createDoc($request, $Sfinancialreqdetail, $fk_financialrequesttype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function updatePaymentDoc(Request $request, SFinacialreqdetailController $Sfinancialreqdetail)
+    {
+        try {
+            DB::beginTransaction();
+            $fk_financialrequesttype = 2;
+            $this->updateDoc($request, $Sfinancialreqdetail, $fk_financialrequesttype);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->serverErrorResponse($e->getMessage());
+        }
+    }
+    public function deletePaymentDoc(Request $request,SFinacialreqdetailController $Sfinancialreqdetail)
+    {
+        try {
+            if (isset($request->pk)) {
+                $data = $request->validate([
+                    'pk' => 'required|array'
+                ]);
+
+                $pk = $data['pk'];
+
+                $this->deleteDoc($pk, 2,$Sfinancialreqdetail);
+
+                return $this->successDelete();
+            }
+        } catch (\Exception $e) {
+            return $this->clientErrorResponse($e->getMessage());
+        }
+    }
+    public function getPaymentDocs(Request $request)
+    {
+        $fk_financialrequesttype = 2;
         return $this->justIndex($fk_financialrequesttype);
     }
 }

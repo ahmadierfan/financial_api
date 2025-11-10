@@ -17,26 +17,27 @@ class SFinacialreqdetailController extends Controller
         $checkbookController = new MCheckbookController();
 
         if (isset(auth()->user()->id)) {
-            DB::beginTransaction();
             try {
                 if ($record['fk_financialpaymentmethod'] == 1) {
                     $check = $checkbookController->justCreate($record);
+                }
+                if ($record['fk_financialpaymentmethod'] == 4) {
+                    $check = m_checkbook::findOrFail($record['fk_check']);
                 }
 
                 s_finacialreqdetail::create(
                     [
                         "fk_registrar" => auth()->user()->id,
                         "fk_financialrequest" => $fk_financialrequest,
-                        "fk_cheque" => $check->pk_checkbook ?? null,
+                        "fk_check" => $check->pk_checkbook ?? null,
                         "fk_financialpaymentmethod" => $record['fk_financialpaymentmethod'],
                         "fk_moneybox" => !empty($record['fk_moneybox']) ? $record['fk_moneybox'] : null,
                         "fk_bankaccount" => !empty($record['fk_bankaccount']) ? $record['fk_bankaccount'] : null,
                         "price" => $record['price'],
                     ]
                 );
-                DB::commit();
+                
             } catch (\Exception $e) {
-                DB::rollBack();
                 return $this->serverErrorResponse(__('messages.error.server') . ' ' . $e->getMessage());
             }
         }
@@ -46,7 +47,6 @@ class SFinacialreqdetailController extends Controller
         $checkbookController = new MCheckbookController();
 
         if (isset(auth()->user()->id)) {
-            DB::beginTransaction();
             try {
                 if ($record['fk_financialpaymentmethod'] == 1) {
                     $check = $checkbookController->justUpdate($record);
@@ -68,10 +68,7 @@ class SFinacialreqdetailController extends Controller
                 );
                 }
 
-                
-                DB::commit();
             } catch (\Exception $e) {
-                DB::rollBack();
                 return $this->serverErrorResponse(__('messages.error.server') . ' ' . $e->getMessage());
             }
         }
@@ -83,7 +80,7 @@ class SFinacialreqdetailController extends Controller
             's_finacialreqdetails.*',
             'm_checkbooks.*'
         )
-            ->leftJoin('m_checkbooks', 's_finacialreqdetails.fk_cheque', '=', 'm_checkbooks.pk_checkbook')
+            ->leftJoin('m_checkbooks', 's_finacialreqdetails.fk_check', '=', 'm_checkbooks.pk_checkbook')
             ->where('fk_financialrequest', $fk_financialrequest)
             ->get();
         return $data;
@@ -93,7 +90,7 @@ class SFinacialreqdetailController extends Controller
         s_finacialreqdetail::
         where('fk_financialrequest', $fk_financialrequest)
         ->where('fk_financialpaymentmethod','!=',1)
-        ->where('fk_financialpaymentmethod','!=',6)->delete();
+        ->where('fk_financialpaymentmethod','!=',4)->delete();
     }
     function deleteAllrecords($fk_financialrequest)
     {
