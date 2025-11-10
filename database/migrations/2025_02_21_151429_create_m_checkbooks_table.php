@@ -17,6 +17,7 @@ class CreateMCheckbooksTable extends Migration
             $table->foreignId('fk_registrar')->constrained('users', 'id');
             $table->foreignId('fk_financialrequesttype')->nullable()->constrained('b_financialrequeststypes','pk_financialrequesttype');
             $table->foreignId('fk_payer')->nullable()->constrained('users', 'id');
+            $table->foreignId('fk_receiver')->nullable()->constrained('users', 'id');
             $table->foreignId('fk_checkbankaccount')->nullable()->constrained('m_bankaccounts', 'pk_bankaccount');
             $table->string('bank')->nullable();
             $table->string('branch')->nullable();

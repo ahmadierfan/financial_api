@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main\MFinancialrequestController;
+use App\Http\Controllers\Main\MCheckbookController;
 
 Route::prefix('financial/v1/company/treasury')->group(function () {
     Route::middleware('auth:api')->group(function () {
@@ -17,5 +18,8 @@ Route::prefix('financial/v1/company/treasury')->group(function () {
         Route::delete('delete-payment-doc', [MFinancialrequestController::class, 'deletePaymentDoc']);
         Route::post('update-payment-doc', [MFinancialrequestController::class, 'updatepaymentDoc']);
         Route::get('payment-requirment', [MFinancialrequestController::class, 'paymentRequirment']);
+        // check
+        Route::get('get-payment-checks', [MCheckbookController::class, 'paymentCheck']);
+        Route::get('get-receive-checks', [MCheckbookController::class, 'receiveCheck']);
     });
 });

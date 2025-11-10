@@ -22,7 +22,7 @@ class SFinacialreqdetailController extends Controller
                     $check = $checkbookController->justCreate($record);
                 }
                 if ($record['fk_financialpaymentmethod'] == 4) {
-                    $check = m_checkbook::findOrFail($record['fk_check']);
+                    $check = $checkbookController->forwardCheck($record); 
                 }
 
                 s_finacialreqdetail::create(
@@ -50,23 +50,41 @@ class SFinacialreqdetailController extends Controller
             try {
                 if ($record['fk_financialpaymentmethod'] == 1) {
                     $check = $checkbookController->justUpdate($record);
-                    $subcheck = s_finacialreqdetail::findOrFail($record['pk_finacialreqdetail']);
-                    $subcheck->update([                       
+                    if($check)
+                    {
+                        $subcheck = s_finacialreqdetail::findOrFail($record['pk_finacialreqdetail']);
+                        $subcheck->update([                       
                         "price" => $record['price'],
-                    ]);
-                }else{
-                    s_finacialreqdetail::create(
-                    [
-                        "fk_registrar" => auth()->user()->id,
-                        "fk_financialrequest" => $fk_financialrequest,
-                        "fk_cheque" => $check->pk_checkbook ?? null,
-                        "fk_financialpaymentmethod" => $record['fk_financialpaymentmethod'],
-                        "fk_moneybox" => !empty($record['fk_moneybox']) ? $record['fk_moneybox'] : null,
-                        "fk_bankaccount" => !empty($record['fk_bankaccount']) ? $record['fk_bankaccount'] : null,
-                        "price" => $record['price'],
-                    ]
-                );
+                        ]);
+                        return;
+
+                    }else{
+                        $check = $checkbookController->justCreate($record);
+                    }
+                    
+                    
+                }elseif($record['fk_financialpaymentmethod'] == 4)
+                {
+                    if (empty($record['pk_finacialreqdetail']))
+                    {
+                        $check = $checkbookController->forwardCheck($record); 
+                    }
+                    
+
                 }
+                
+                s_finacialreqdetail::create(
+                [
+                    "fk_registrar" => auth()->user()->id,
+                    "fk_financialrequest" => $fk_financialrequest,
+                    "fk_check" => $check->pk_checkbook ?? null,
+                    "fk_financialpaymentmethod" => $record['fk_financialpaymentmethod'],
+                    "fk_moneybox" => !empty($record['fk_moneybox']) ? $record['fk_moneybox'] : null,
+                    "fk_bankaccount" => !empty($record['fk_bankaccount']) ? $record['fk_bankaccount'] : null,
+                    "price" => $record['price'],
+                ]
+            );
+                
 
             } catch (\Exception $e) {
                 return $this->serverErrorResponse(__('messages.error.server') . ' ' . $e->getMessage());

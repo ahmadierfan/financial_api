@@ -118,7 +118,7 @@ class MFinancialrequestController extends Controller
             $doc->save();
         }
     }
-    function docRecordsCreate($request, SFinacialreqdetailController $SFinacialreqdetail, $fk_financialrequest,$fk_financialrequesttype): void
+    function docRecordsCreate($request, SFinacialreqdetailController $SFinacialreqdetail, $fk_financialrequest, $fk_financialrequesttype ,$fk_receiver): void
     {
         if (isset($request->records)) {
 
@@ -130,8 +130,8 @@ class MFinancialrequestController extends Controller
                 $records = json_decode($records, true);
             foreach ($records as $record) {
                 $record['fk_financialrequesttype'] = $fk_financialrequesttype;
+                $record['fk_receiver'] = $fk_receiver;
                 $SFinacialreqdetail->justCreate($record, $fk_financialrequest);
-                    
             }
         }
     }
@@ -147,7 +147,6 @@ class MFinancialrequestController extends Controller
                 $records = json_decode($records, true);
             foreach ($records as $record) {
                 $SFinacialreqdetail->justUpdate($record, $fk_financialrequest);
-                    
             }
         }
     }
@@ -166,10 +165,10 @@ class MFinancialrequestController extends Controller
 
         $data['fk_registrar'] = auth()->id();
         $data['fk_financialrequesttype'] = $fk_financialrequesttype;
-
+        $fk_receiver = $fk_financialrequesttype == 2 ? $data['fk_payerorreceiver'] : NULL;
         $doc = m_financialrequest::create($data);
         if (isset($doc->pk_financialrequest)) {
-            $this->docRecordsCreate($request, $Sfinancialrequestdetail, $doc->pk_financialrequest, $fk_financialrequesttype);
+            $this->docRecordsCreate($request, $Sfinancialrequestdetail, $doc->pk_financialrequest, $fk_financialrequesttype, $fk_receiver);
             $this->checkHasFiles($request, $doc);
         }
     }
@@ -223,11 +222,11 @@ class MFinancialrequestController extends Controller
         $invoices = $Minvoice->index();
         $records = null;
 
-        if (isset($request->financialreqid)){
-            $this->isCorrectCompany(m_financialrequest::class,$request->financialreqid);
+        if (isset($request->financialreqid)) {
+            $this->isCorrectCompany(m_financialrequest::class, $request->financialreqid);
             $records = $Sfinancialreqdetail->recordsForFinancialreq($request->financialreqid);
         }
-            
+
 
         $res = [
             "tabs" => $tabs,
@@ -266,7 +265,7 @@ class MFinancialrequestController extends Controller
             return $this->serverErrorResponse($e->getMessage());
         }
     }
-    public function deleteReceiveDoc(Request $request,SFinacialreqdetailController $Sfinancialreqdetail)
+    public function deleteReceiveDoc(Request $request, SFinacialreqdetailController $Sfinancialreqdetail)
     {
         try {
             if (isset($request->pk)) {
@@ -276,7 +275,7 @@ class MFinancialrequestController extends Controller
 
                 $pk = $data['pk'];
 
-                $this->deleteDoc($pk, 1,$Sfinancialreqdetail);
+                $this->deleteDoc($pk, 1, $Sfinancialreqdetail);
 
                 return $this->successDelete();
             }
@@ -300,11 +299,11 @@ class MFinancialrequestController extends Controller
         $invoices = $Minvoice->index();
         $records = null;
 
-        if (isset($request->financialreqid)){
-            $this->isCorrectCompany(m_financialrequest::class,$request->financialreqid);
+        if (isset($request->financialreqid)) {
+            $this->isCorrectCompany(m_financialrequest::class, $request->financialreqid);
             $records = $Sfinancialreqdetail->recordsForFinancialreq($request->financialreqid);
         }
-            
+
 
         $res = [
             "tabs" => $tabs,
@@ -344,7 +343,7 @@ class MFinancialrequestController extends Controller
             return $this->serverErrorResponse($e->getMessage());
         }
     }
-    public function deletePaymentDoc(Request $request,SFinacialreqdetailController $Sfinancialreqdetail)
+    public function deletePaymentDoc(Request $request, SFinacialreqdetailController $Sfinancialreqdetail)
     {
         try {
             if (isset($request->pk)) {
@@ -354,7 +353,7 @@ class MFinancialrequestController extends Controller
 
                 $pk = $data['pk'];
 
-                $this->deleteDoc($pk, 2,$Sfinancialreqdetail);
+                $this->deleteDoc($pk, 2, $Sfinancialreqdetail);
 
                 return $this->successDelete();
             }
