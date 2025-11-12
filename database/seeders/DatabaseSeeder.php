@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             BWarehousedoctypeSeeder::class,
             BFinancialrequeststypeSeeder::class,
             BFinancialpaymentmethodSeeder::class,
+            BCheckstatusSeeder::class,
 
         ]);
     }

@@ -174,7 +174,7 @@ class MFinancialrequestController extends Controller
     }
 
     public function updateDoc(Request $request, $Sfinancialrequestdetail, $fk_financialrequesttype)
-    {
+{
 
         $data = $request->validate([
             'pk_financialrequest' => 'required|integer',

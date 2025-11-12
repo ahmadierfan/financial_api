@@ -19,7 +19,14 @@ Route::prefix('financial/v1/company/treasury')->group(function () {
         Route::post('update-payment-doc', [MFinancialrequestController::class, 'updatepaymentDoc']);
         Route::get('payment-requirment', [MFinancialrequestController::class, 'paymentRequirment']);
         // check
+        Route::get('check-edit-requirment', [MCheckbookController::class, 'checkRequirment']);
+
         Route::get('get-payment-checks', [MCheckbookController::class, 'paymentCheck']);
+        Route::post('update-payment-check', [MCheckbookController::class, 'updatePaymentCheck']);
+        Route::delete('delete-payment-check', [MCheckbookController::class, 'deletePaymentCheck']);
+
         Route::get('get-receive-checks', [MCheckbookController::class, 'receiveCheck']);
+        Route::post('update-receive-check', [MCheckbookController::class, 'updateReceiveCheck']);
+        Route::delete('delete-receive-check', [MCheckbookController::class, 'deleteReceiveCheck']);
     });
 });
