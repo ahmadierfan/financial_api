@@ -17,6 +17,8 @@ return new class extends Migration
             $table->bigIncrements('pk_checkstatus');
             $table->string('checkstatus');
             $table->string('checkstatussec')->nullable();
+            $table->tinyInteger('isinpay')->default(1);
+            $table->tinyInteger('isinreceive')->default(1);
             $table->tinyInteger('isenable')->default(1);
             $table->timestamps();
         });
