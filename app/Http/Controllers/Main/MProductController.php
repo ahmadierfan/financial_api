@@ -30,7 +30,7 @@ class MProductController extends Controller
         }
 
     }
-    public function index(Request $request)
+    public function index(Request $request = null)
     {
         if (isset(auth()->user()->fk_company)) {
             $products = DB::table('m_products')

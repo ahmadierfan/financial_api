@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Main\MWarehousedocController;
+use App\Http\Controllers\view\WWarehousekardexController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('financial/v1/company/warehouse')->group(function () {
@@ -24,5 +25,9 @@ Route::prefix('financial/v1/company/warehouse')->group(function () {
         Route::delete('delete-transfer-doc', [MWarehousedocController::class, 'deleteTransferDoc']);
         Route::post('update-transfer-doc', [MWarehousedocController::class, 'updateTransferDoc']);
         Route::get('transfer-requirment', [MWarehousedocController::class, 'transferRequirment']);
+        // kardex
+        Route::get('kardex-requirment', [WWarehousekardexController::class, 'kardexRequirment']);
+        Route::get('get-warehouse-kardexes', [WWarehousekardexController::class, 'forCompany']);
+
     });
 });
