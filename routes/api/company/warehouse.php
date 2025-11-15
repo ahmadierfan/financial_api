@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Main\MWarehousedocController;
 use App\Http\Controllers\view\WWarehousekardexController;
+use App\Http\Controllers\view\WWarehouseinventoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('financial/v1/company/warehouse')->group(function () {
@@ -28,6 +29,9 @@ Route::prefix('financial/v1/company/warehouse')->group(function () {
         // kardex
         Route::get('kardex-requirment', [WWarehousekardexController::class, 'kardexRequirment']);
         Route::get('get-warehouse-kardexes', [WWarehousekardexController::class, 'forCompany']);
+
+        Route::get('inventory-requirment', [WWarehouseinventoryController::class, 'inventoryRequirment']);
+        Route::get('get-warehouse-inventory', [WWarehouseinventoryController::class, 'forCompany']);
 
     });
 });

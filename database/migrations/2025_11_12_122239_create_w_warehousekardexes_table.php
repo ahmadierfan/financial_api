@@ -19,6 +19,7 @@ return new class extends Migration
                 d.fk_product AS fk_product,
                 p.product AS productname,
                 d.fk_unit AS fk_unit,
+                reg.fk_company AS fk_company,
                 uunit.unit AS unit,
                 d.feeprice AS feeprice,
                 d.count AS count,
