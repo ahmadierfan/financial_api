@@ -10,7 +10,13 @@ use App\Traits\ResponseTrait;
 class SAccountingsubController extends Controller
 {
     use ResponseTrait;
-
+    public function forCompany()
+    {
+        $accsub = s_accountingsub::select('*')
+        ->join('users','s_accountingsubs.fk_registrar','=','users.id')
+        ->where('users.fk_company',auth()->user()->fk_company)->get();
+        return $accsub;
+    }
     function addSubAccountingDoc($data, $request, $fk_accountingsubgreoup)
     {
         if (isset($request->typeOfSubAccount)) {

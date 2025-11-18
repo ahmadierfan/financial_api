@@ -16,9 +16,10 @@ class CreateSAccountingDocDetailsTable extends Migration
             $table->bigIncrements('pk_accountingdocdetail');
             $table->foreignId('fk_registrar')->constrained('users', 'id');
             $table->foreignId('fk_accountingdoc')->constrained('m_accountingdocs', 'pk_accountingdoc');
-            $table->foreignId('fk_coding')->constrained('m_codings', 'pk_coding');
+            $table->foreignId('fk_coding')->nullable()->constrained('m_codings', 'pk_coding');
             $table->foreignId('fk_accountingsub')->nullable()->constrained('s_accountingsubs', 'pk_accountingsub');
-            $table->bigInteger('amount');
+            $table->bigInteger('debtor');
+            $table->bigInteger('creditor');
             $table->string('description', 45)->nullable();
             $table->tinyInteger('isenable')->default(1);
             $table->timestamps(0);
