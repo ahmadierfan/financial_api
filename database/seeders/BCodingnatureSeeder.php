@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-
 use Illuminate\Database\Seeder;
+
+use Illuminate\Support\Facades\DB;
 
 class BCodingnatureSeeder extends Seeder
 {
@@ -12,6 +13,8 @@ class BCodingnatureSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+
+
+
     }
 }
