@@ -19,7 +19,6 @@ class BFinancialpaymentmethodSeeder extends Seeder
             ['pk_financialpaymentmethod' => 4, 'isinpay' => 1, 'isenable' => 1, 'isinreceive' => 0, 'financialpaymentmethod' => 'خرج‌چک'],
             ['pk_financialpaymentmethod' => 5, 'isinpay' => 1, 'isenable' => 0, 'isinreceive' => 1, 'financialpaymentmethod' => 'تنخواه'],
             ['pk_financialpaymentmethod' => 6, 'isinpay' => 1, 'isenable' => 0, 'isinreceive' => 1, 'financialpaymentmethod' => 'اشخاص'],
-
         ]);
     }
 }
